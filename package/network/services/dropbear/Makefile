@@ -56,8 +56,10 @@ define Package/dropbear
   SECTION:=net
   CATEGORY:=Base system
   TITLE:=Small SSH2 client/server
-  DEPENDS:= +DROPBEAR_ZLIB:zlib
-  ALTERNATIVES:=100:/usr/bin/ssh-keygen:/usr/sbin/dropbear
+  DEPENDS:= +DROPBEAR_ZLIB:zlib +DROPBEAR_SVR_PAM:libpam
+  ALTERNATIVES:=
+  $(if $(CONFIG_DROPBEAR_SVR_PAM),,ALTERNATIVES+= \
+	  100:/usr/bin/ssh-keygen:/usr/sbin/dropbear)
   $(if $(CONFIG_DROPBEAR_SCP),ALTERNATIVES+= \
 	  100:/usr/bin/scp:/usr/sbin/dropbear,)
   $(if $(CONFIG_DROPBEAR_DBCLIENT),ALTERNATIVES+= \
@@ -86,7 +88,7 @@ define Package/dropbearconvert
 endef
 
 CONFIGURE_ARGS += \
-	--disable-pam \
+	$(if $(CONFIG_DROPBEAR_SVR_PAM),--enable-pam,--disable-pam) \
 	--enable-openpty \
 	--enable-syslog \
 	--disable-lastlog \
@@ -157,6 +159,8 @@ DB_OPT_CONFIG = \
 	DROPBEAR_ENABLE_CTR_MODE,CONFIG_DROPBEAR_MODERN_ONLY,0,1 \
 	DROPBEAR_RSA,CONFIG_DROPBEAR_MODERN_ONLY,0,1 \
 	DROPBEAR_RSA_SHA1,CONFIG_DROPBEAR_MODERN_ONLY,0,1 \
+	DROPBEAR_SVR_PASSWORD_AUTH,CONFIG_DROPBEAR_SVR_PAM,0,1 \
+	DROPBEAR_SVR_PAM_AUTH,CONFIG_DROPBEAR_SVR_PAM,1,0 \
 
 
 TARGET_CFLAGS += -DARGTYPE=3
@@ -229,6 +233,9 @@ define Package/dropbear/install
 	$(INSTALL_DATA) ./files/dropbear.failsafe $(1)/lib/preinit/99_10_failsafe_dropbear
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_DATA) ./files/dropbear.defaults $(1)/etc/uci-defaults/50-dropbear
+	$(if $(CONFIG_DROPBEAR_SVR_PAM),
+		$(INSTALL_DIR) $(1)/etc/pam.d && \
+		$(INSTALL_CONF) ./files/etc-pam.d-sshd $(1)/etc/pam.d/sshd,)
 	$(foreach f,$(filter /etc/dropbear/%,$(Package/dropbear/conffiles)),$(if $(wildcard $(TOPDIR)/files/$(f)),chmod 0600 $(TOPDIR)/files/$(f) || :; ))
 endef
 
