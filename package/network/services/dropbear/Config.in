@@ -1,6 +1,13 @@
 menu "Configuration"
 	depends on PACKAGE_dropbear
 
+config DROPBEAR_SVR_PAM
+	bool "Enable PAM support"
+	default n
+	select PACKAGE_libpam
+	help
+		Enables PAM support
+
 config DROPBEAR_CURVE25519
 	bool "Curve25519 support"
 	default y
