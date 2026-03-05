@@ -62,8 +62,10 @@ define Package/dropbear
   CATEGORY:=Base system
   TITLE:=Small SSH2 client/server
   MENU:=1
-  DEPENDS:= +USE_GLIBC:libcrypt-compat +DROPBEAR_ZLIB:zlib
-  ALTERNATIVES:=100:/usr/bin/ssh-keygen:/usr/sbin/dropbear
+  DEPENDS:= +USE_GLIBC:libcrypt-compat +DROPBEAR_ZLIB:zlib +DROPBEAR_SVR_PAM:libpam
+  ALTERNAVITVES:=
+  $(if $(CONFIG_DROPBEAR_SVR_PAM),,ALTERNATIVES+= \
+	  100:/usr/bin/ssh-keygen:/usr/sbin/dropbear)
   $(if $(CONFIG_DROPBEAR_SCP),ALTERNATIVES+= \
 	  100:/usr/bin/scp:/usr/sbin/dropbear,)
   $(if $(CONFIG_DROPBEAR_DBCLIENT),ALTERNATIVES+= \
@@ -92,7 +94,7 @@ define Package/dropbearconvert
 endef
 
 CONFIGURE_ARGS += \
-	--disable-pam \
+	$(if $(CONFIG_DROPBEAR_SVR_PAM),--enable-pam,--disable-pam) \
 	--disable-pututxline \
 	--disable-utmpx \
 	--disable-wtmpx \
@@ -208,6 +210,8 @@ DB_OPT_CONFIG = \
 	DROPBEAR_X11FWD,CONFIG_DROPBEAR_X11FWD,1,0 \
 	INETD_MODE,CONFIG_DROPBEAR_INETD_MODE,1,0 \
 	LOG_COMMANDS,CONFIG_DROPBEAR_LOG_COMMANDS,1,0 \
+	DROPBEAR_SVR_PASSWORD_AUTH,CONFIG_DROPBEAR_SVR_PAM,0,1 \
+	DROPBEAR_SVR_PAM_AUTH,CONFIG_DROPBEAR_SVR_PAM,1,0 \
 
 
 TARGET_CFLAGS += -DARGTYPE=3
