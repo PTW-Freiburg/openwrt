@@ -3,6 +3,13 @@ if PACKAGE_dropbear
 ## <GENERIC>
 comment "Generic options"
 
+config DROPBEAR_SVR_PAM
+	bool "Enable PAM support"
+	default n
+	select PACKAGE_libpam
+	help
+		Enables PAM support
+
 config DROPBEAR_STATIC_BUILD
 	bool "Build static binaries"
 	depends on DEVEL
