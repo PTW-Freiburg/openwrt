@@ -255,6 +255,8 @@ sub parse_package_metadata($) {
 		/^Submenu: \s*(.+)\s*$/ and $pkg->{submenu} = $1;
 		/^Submenu-Depends: \s*(.+)\s*$/ and $pkg->{submenudep} = $1;
 		/^Source: \s*(.+)\s*$/ and $pkg->{source} = $1;
+		/^Source-Name: \s*(.+)\s*$/ and $pkg->{sourcename} = $1;
+		/^Build-Dir: \s*(.+)\s*$/ and $pkg->{builddir} = $1;
 		/^Source-URL: \s*(.+)\s*$/ and $pkg->{sourceurl} = $1;
 		/^Source-Protocol: \s*(.+)\s*$/ and $pkg->{sourceproto} = $1;
 		/^License: \s*(.+)\s*$/ and $pkg->{license} = $1;
